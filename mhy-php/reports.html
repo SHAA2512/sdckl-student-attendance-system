@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reports - SDCKL Student Attendance System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+    <script src="js/main.js" defer></script>
+</head>
+<body class="bg-white">
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-2xl font-bold text-blue-600">SDCKL</span>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="index.html" class="text-gray-600 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                            <a href="attendance.html" class="text-gray-600 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Attendance</a>
+                            <a href="reports.html" class="bg-blue-500 text-white px-3 py-2 rounded-md text-sm font-medium">Reports</a>
+                            <a href="students.html" class="text-gray-600 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                                <i class="fas fa-user-graduate mr-2"></i> Students
+                            </a>
+                            <a href="classes.html" class="text-gray-600 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Classes</a>
+                            <a href="#" data-action="logout" class="text-gray-600 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Logout</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-4 flex items-center md:ml-6">
+                        <a href="login.html" class="text-gray-600 hover:text-blue-500">
+                            <i class="fas fa-user-circle text-2xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-6">Attendance Reports</h1>
+        <div class="mb-4 flex flex-wrap items-center space-x-4">
+            <button id="simulateAttendanceBtn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Simulate Attendance Records</button>
+            <input type="date" id="filterStartDate" class="border border-gray-300 rounded-md p-2" />
+            <input type="date" id="filterEndDate" class="border border-gray-300 rounded-md p-2" />
+            <input type="text" id="filterStudentName" placeholder="Filter by Student Name" class="border border-gray-300 rounded-md p-2" />
+            <button id="filterBtn" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">Filter</button>
+            <button id="clearFilterBtn" class="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500">Clear Filters</button>
+            <button id="exportBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Export CSV</button>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6 overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200" id="reportTable">
+                <thead>
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="reportTableBody" class="bg-white divide-y divide-gray-200">
+                    <!-- Attendance records will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!auth.checkAuth()) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const reportTableBody = document.getElementById('reportTableBody');
+            const simulateAttendanceBtn = document.getElementById('simulateAttendanceBtn');
+            const filterStartDate = document.getElementById('filterStartDate');
+            const filterEndDate = document.getElementById('filterEndDate');
+            const filterStudentName = document.getElementById('filterStudentName');
+            const filterBtn = document.getElementById('filterBtn');
+            const clearFilterBtn = document.getElementById('clearFilterBtn');
+            const exportBtn = document.getElementById('exportBtn');
+
+            function loadAttendanceRecords(filter = {}) {
+                let attendanceRecords = window.getAttendanceRecords();
+
+                if (filter.startDate) {
+                    attendanceRecords = attendanceRecords.filter(record => new Date(record.timestamp) >= new Date(filter.startDate));
+                }
+                if (filter.endDate) {
+                    attendanceRecords = attendanceRecords.filter(record => new Date(record.timestamp) <= new Date(filter.endDate));
+                }
+                if (filter.studentName) {
+                    attendanceRecords = attendanceRecords.filter(record => record.studentName.toLowerCase().includes(filter.studentName.toLowerCase()));
+                }
+
+                reportTableBody.innerHTML = '';
+                attendanceRecords.forEach(record => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${record.studentId}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${record.studentName}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(record.timestamp).toLocaleString()}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm ${
+                            record.status === 'Present' || record.status === 'Late' ? 'text-green-600' : 'text-red-600'
+                        }">${record.status}</td>
+                    `;
+                    reportTableBody.appendChild(tr);
+                });
+            }
+
+            simulateAttendanceBtn.addEventListener('click', () => {
+                // Simulate attendance records for testing
+                const students = JSON.parse(localStorage.getItem('students')) || [];
+                if (students.length === 0) {
+                    alert('No students found to simulate attendance.');
+                    return;
+                }
+
+                const attendanceRecords = [];
+                const today = new Date();
+                for (let i = 0; i < 5; i++) {
+                    const date = new Date(today);
+                    date.setDate(today.getDate() - i);
+                    const isoDate = date.toISOString().slice(0, 10);
+
+                    students.forEach(student => {
+                        attendanceRecords.push({
+                            studentId: student.studentId,
+                            studentName: student.studentName,
+                            timestamp: isoDate + 'T08:00:00.000Z',
+                            status: 'Present'
+                        });
+                    });
+                }
+
+                localStorage.setItem('attendanceRecords', JSON.stringify(attendanceRecords));
+                loadAttendanceRecords();
+                alert('Simulated attendance records added.');
+            });
+
+            filterBtn.addEventListener('click', () => {
+                loadAttendanceRecords({
+                    startDate: filterStartDate.value,
+                    endDate: filterEndDate.value,
+                    studentName: filterStudentName.value
+                });
+            });
+
+            clearFilterBtn.addEventListener('click', () => {
+                filterStartDate.value = '';
+                filterEndDate.value = '';
+                filterStudentName.value = '';
+                loadAttendanceRecords();
+            });
+
+            exportBtn.addEventListener('click', () => {
+                const records = window.getAttendanceRecords();
+                if (records.length === 0) {
+                    alert('No attendance records to export.');
+                    return;
+                }
+
+                const csvRows = [];
+                const headers = ['Student ID', 'Student Name', 'Date & Time', 'Status'];
+                csvRows.push(headers.join(','));
+
+                records.forEach(record => {
+                    const row = [
+                        `"${record.studentId}"`,
+                        `"${record.studentName}"`,
+                        `"${new Date(record.timestamp).toLocaleString()}"`,
+                        `"${record.status}"`
+                    ];
+                    csvRows.push(row.join(','));
+                });
+
+                const csvString = csvRows.join('\n');
+                const blob = new Blob([csvString], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.setAttribute('hidden', '');
+                a.setAttribute('href', url);
+                a.setAttribute('download', 'attendance_reports.csv');
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            });
+
+            loadAttendanceRecords();
+        });
+    </script>
+</body>
+</html>
