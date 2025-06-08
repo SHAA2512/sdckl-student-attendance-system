@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDCKL Student Attendance System</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+    <!-- Main JavaScript -->
+    <script src="js/main.js"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-2xl font-bold text-blue-600">SDCKL</span>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="index.html" class="bg-blue-500 text-white px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                            <a href="attendance.html" class="text-gray-600 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Attendance</a>
+                            <a href="reports.html" class="text-gray-600 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Reports</a>
+                            <a href="settings.html" class="text-gray-600 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Settings</a>
+                            <a href="#" data-action="logout" class="text-gray-600 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Logout</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-4 flex items-center md:ml-6">
+                        <a href="login.html" class="text-gray-600 hover:text-blue-500">
+                            <i class="fas fa-user-circle text-2xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Welcome Banner -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-8 py-12">
+                <div class="max-w-3xl">
+                    <h1 class="text-4xl font-bold text-white mb-4">Welcome to SDCKL Attendance System</h1>
+                    <p class="text-blue-100 text-lg">Manage student attendance efficiently with our biometric system</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- Total Students -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-500 bg-opacity-10">
+                        <i class="fas fa-users text-2xl text-blue-500"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-gray-500 text-sm">Total Students</p>
+                        <h3 class="text-2xl font-bold text-gray-800">1,234</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Present Today -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-500 bg-opacity-10">
+                        <i class="fas fa-check-circle text-2xl text-green-500"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-gray-500 text-sm">Present Today</p>
+                        <h3 class="text-2xl font-bold text-gray-800">1,180</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Absent Today -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-red-500 bg-opacity-10">
+                        <i class="fas fa-times-circle text-2xl text-red-500"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-gray-500 text-sm">Absent Today</p>
+                        <h3 class="text-2xl font-bold text-gray-800">54</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Quick Actions</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <a href="attendance.html" class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition duration-300">
+                    <i class="fas fa-fingerprint text-2xl text-blue-500 mr-4"></i>
+                    <div>
+                        <h3 class="font-semibold text-gray-800">Mark Attendance</h3>
+                        <p class="text-sm text-gray-600">Use biometric scanner</p>
+                    </div>
+                </a>
+                <a href="reports.html" class="flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition duration-300">
+                    <i class="fas fa-chart-bar text-2xl text-green-500 mr-4"></i>
+                    <div>
+                        <h3 class="font-semibold text-gray-800">View Reports</h3>
+                        <p class="text-sm text-gray-600">Attendance analytics</p>
+                    </div>
+                </a>
+                <a href="settings.html" class="flex items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition duration-300">
+                    <i class="fas fa-cog text-2xl text-purple-500 mr-4"></i>
+                    <div>
+                        <h3 class="font-semibold text-gray-800">Settings</h3>
+                        <p class="text-sm text-gray-600">Configure system</p>
+                    </div>
+                </a>
+                <a href="help.html" class="flex items-center p-4 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition duration-300">
+                    <i class="fas fa-question-circle text-2xl text-yellow-500 mr-4"></i>
+                    <div>
+                        <h3 class="font-semibold text-gray-800">Help</h3>
+                        <p class="text-sm text-gray-600">Get support</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Recent Activity</h2>
+            <div class="space-y-4">
+                <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+                    <div class="p-2 rounded-full bg-green-500 bg-opacity-10">
+                        <i class="fas fa-check text-green-500"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-gray-800">John Doe marked attendance</p>
+                        <p class="text-sm text-gray-500">2 minutes ago</p>
+                    </div>
+                </div>
+                <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+                    <div class="p-2 rounded-full bg-blue-500 bg-opacity-10">
+                        <i class="fas fa-sync text-blue-500"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-gray-800">System generated daily report</p>
+                        <p class="text-sm text-gray-500">10 minutes ago</p>
+                    </div>
+                </div>
+                <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+                    <div class="p-2 rounded-full bg-yellow-500 bg-opacity-10">
+                        <i class="fas fa-exclamation-triangle text-yellow-500"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-gray-800">Late arrival marked for Jane Smith</p>
+                        <p class="text-sm text-gray-500">15 minutes ago</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white shadow-lg mt-12">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-gray-500 text-sm">
+                © 2024 SDCKL Student Attendance System. All rights reserved.
+            </p>
+        </div>
+    </footer>
+</body>
+</html>
