@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Attendance - SDCKL Student Attendance System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        @keyframes scanLineMove {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+        #scanLine.active {
+            display: block !important;
+            animation: scanLineMove 2s linear infinite;
+        }
+    </style>
+    <script src="js/biometric-device.js" defer></script>
+    <script src="js/main.js" defer></script>
+</head>
+<body class="bg-red-50">
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-2xl font-bold text-blue-600">SDCKL</span>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="index.html" class="text-gray-600 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                            <a href="attendance.html" class="bg-blue-500 text-white px-3 py-2 rounded-md text-sm font-medium">Attendance</a>
+                            <a href="reports.html" class="text-gray-600 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Reports</a>
+                            <a href="students.html" class="text-gray-600 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                                <i class="fas fa-user-graduate mr-2"></i> Students
+                            </a>
+                            <a href="classes.html" class="text-gray-600 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Classes</a>
+                            <a href="#" data-action="logout" class="text-gray-600 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Logout</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-4 flex items-center md:ml-6">
+                        <a href="login.html" class="text-gray-600 hover:text-blue-500">
+                            <i class="fas fa-user-circle text-2xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-900">Mark Attendance</h1>
+                <p class="mt-2 text-gray-600">Use the biometric scanner to mark your attendance</p>
+            </div>
+
+            <div class="max-w-md mx-auto">
+                <div class="bg-white rounded-lg p-8 mb-6">
+                    <div class="flex flex-col items-center">
+                        <div id="scannerArea" class="w-48 h-48 bg-blue-50 rounded-lg border-2 border-blue-200 flex items-center justify-center mb-6 relative overflow-hidden">
+                            <div id="scanLine" class="absolute top-0 w-full h-1 bg-blue-500 opacity-75" style="display: none;"></div>
+                            <i class="fas fa-fingerprint text-7xl text-blue-300"></i>
+                        </div>
+
+                        <div id="statusDisplay" class="text-center mb-6">
+                            <p id="statusText" class="text-lg font-medium text-gray-700">Ready to scan</p>
+                            <p id="studentInfo" class="text-sm text-gray-500 mt-2 hidden">Student ID: <span id="studentId"></span></p>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div id="deviceStatus" class="text-sm text-gray-500 text-center">
+                                Device Status: <span class="font-medium text-red-500">Not Connected</span>
+                            </div>
+                            <button id="scanButton" class="w-full bg-blue-600 text-white px-6 py-3 rounded-md font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out">
+                                Start Scanning
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg border border-gray-200">
+                    <div class="px-4 py-3 border-b border-gray-200">
+                        <h3 class="text-lg font-medium text-gray-900">Recent Scans</h3>
+                    </div>
+                    <div class="divide-y divide-gray-200" id="recentScans">
+                        <!-- Recent scans will be added here dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const scanButton = document.getElementById('scanButton');
+            const statusText = document.getElementById('statusText');
+            const studentInfo = document.getElementById('studentInfo');
+            const studentIdSpan = document.getElementById('studentId');
+            const scanLine = document.getElementById('scanLine');
+            const recentScans = document.getElementById('recentScans');
+            const deviceStatus = document.getElementById('deviceStatus').querySelector('span');
+
+            function updateDeviceStatus(isConnected) {
+                deviceStatus.textContent = isConnected ? 'Connected' : 'Not Connected';
+                deviceStatus.className = isConnected ? 
+                    'font-medium text-green-500' : 
+                    'font-medium text-red-500';
+            }
+
+            function addRecentScan(record) {
+                const div = document.createElement('div');
+                div.className = 'px-4 py-2 flex justify-between items-center';
+                div.innerHTML = `
+                    <div>
+                        <p class="font-semibold text-gray-900">${record.studentName}</p>
+                        <p class="text-sm text-gray-600">${new Date(record.timestamp).toLocaleString()}</p>
+                    </div>
+                    <div>
+                        <span class="px-2 py-1 rounded-full text-white text-xs font-semibold ${
+                            record.status === 'Present' ? 'bg-green-500' :
+                            record.status === 'Late' ? 'bg-yellow-500' :
+                            'bg-red-500'
+                        }">${record.status}</span>
+                    </div>
+                `;
+                recentScans.prepend(div);
+            }
+
+            function loadRecentScans() {
+                recentScans.innerHTML = '';
+                const records = window.getAttendanceRecords();
+                records.slice(-5).reverse().forEach(addRecentScan);
+            }
+
+            scanButton.addEventListener('click', async () => {
+                try {
+                    scanButton.disabled = true;
+                    statusText.textContent = 'Initializing device...';
+                    scanLine.classList.add('active');
+                    studentInfo.classList.add('hidden');
+
+                    const result = await window.biometric.startScan();
+                    
+                    if (result.success) {
+                        updateDeviceStatus(true);
+                        statusText.textContent = 'Scan successful!';
+                        studentIdSpan.textContent = result.studentId;
+                        studentInfo.classList.remove('hidden');
+
+                        // Save attendance record
+                        const attendanceRecord = {
+                            studentId: result.studentId,
+                            studentName: result.studentName,
+                            timestamp: new Date().toISOString(),
+                            status: 'Present'
+                        };
+                        window.saveAttendanceRecord(attendanceRecord);
+
+                        addRecentScan(attendanceRecord);
+                        window.notifications.add(`Attendance marked for ${result.studentName}`, 'success');
+                    } else {
+                        updateDeviceStatus(false);
+                        statusText.textContent = 'Scan failed. Please try again.';
+                        window.notifications.add(result.error, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error during scan:', error);
+                    updateDeviceStatus(false);
+                    statusText.textContent = 'Device error. Please try again.';
+                    window.notifications.add('Failed to communicate with device', 'error');
+                } finally {
+                    scanLine.classList.remove('active');
+                    scanButton.disabled = false;
+                    loadRecentScans();
+                }
+            });
+
+            loadRecentScans();
+        });
+    </script>
+</body>
+</html>
